@@ -113,6 +113,11 @@ void print_numbers(unsigned long i)
     int k;
     unsigned long a[100];
     k=0;
+    if(i==0)
+    {
+        terminal_putchar('0');
+        return;
+    }
     while(i>0)
     {
         a[k] = (i%10);
@@ -153,85 +158,76 @@ void print_numbers(unsigned long i)
 #if defined(__cplusplus)
 extern "C" /* Use C linkage for kernel_main. */
 #endif
-void kernel_main(multiboot_info_t* mbd, memory_map_t *mm,unsigned int magic)
+void kernel_main(multiboot_info_t* mbd,unsigned int magic)
 {
-	unsigned long *mad;
-	unsigned long l,i=0;
+
+	uint16_t i = 1,j=0,k=0;
 	terminal_initialize();
 	/* Since there is no support for newlines in terminal_putchar yet, \n will
 	   produce some VGA specific character instead. This is normal.
-	//terminal_writestring("Hello, kernel!\n");
-	//terminal_row++;//hello world
-	//terminal_column=0;
-	print_numbers(mbd->flags);//6759
-	terminal_row++;//1101001100111
-	terminal_column=0;
-	print_numbers(mbd->mem_lower);//639
-	terminal_row++;
-	terminal_column=0;
-	print_numbers(mbd->mem_upper);//129984
-	terminal_row++;
-	terminal_column=0;
-	print_numbers(mbd->boot_device);//3774873599
-	terminal_row++;
-	terminal_column=0;
-	print_numbers(mbd->cmdline);//65656
-	terminal_row++;
-	terminal_column=0;
-	print_numbers(mbd->mods_count);//
-	terminal_row++;
-	terminal_column=0;
-	print_numbers(mbd->mods_addr);//
-	terminal_row++;
-	terminal_column=0;*/
+	*/
 	print_numbers(mbd->mmap_length);//144
 	terminal_row++;
 	terminal_column=0;
 	print_numbers(mbd->mmap_addr);//65704
 	terminal_row++;
 	terminal_column=0;
-    mad = (unsigned long *)mbd->mmap_addr;
-    l = mbd->mmap_length;
-    i = 0;
-    while(i<l)
-    {
-        print_numbers(*mad);
-        mad += 1;
-        i++;
-        terminal_column++;
-    }
-    /*
-	print_numbers(mm->size);//
-	terminal_row++;
-	terminal_column=0;
-	print_numbers(mm->base_addr_low);//
-	terminal_row++;
-	terminal_column=0;
-	print_numbers(mm->length_low);//
-	terminal_row++;
-	terminal_column=0;
-	print_numbers(mm->base_addr_high);//
-	terminal_row++;
-	terminal_column=0;
-    print_numbers(mm->length_high);//
-	terminal_row++;
-	terminal_column=0;
-	print_numbers(mm->type);//
-	terminal_row++;
-	terminal_column=0;
-    if(((mbd->flags) & k) == 1)
-	{
-        print_numbers(mbd->flags);//6759
-        terminal_row++;
-        terminal_column=0;
-        if((mbd->flags) & 32)
-        {
-            terminal_writestring("6th bit is working");
-        }
-	}
-	else
-	{
-        terminal_writestring("Why I am so unlucky\n");
-	}*/
 
+	memory_map_t * mm =(memory_map_t *)  mbd->mmap_addr;
+	/*
+	typedef struct memory_map
+     {
+       unsigned long size;
+       unsigned long base_addr_low;
+       unsigned long base_addr_high;
+       unsigned long length_low;
+       unsigned long length_high;
+       unsigned long type;
+     } memory_map_t;
+
+	*/
+	while(i <= (mbd->mmap_length)/sizeof(memory_map_t))
+	{
+        if(mm->type == 1 )
+        {
+            terminal_writestring("string_");
+            print_numbers(i);
+            terminal_row++;
+            terminal_column = 0;
+            print_numbers(mm->size);
+            terminal_row++;
+            terminal_column = 0;
+            print_numbers(mm->base_addr_low);
+            terminal_row++;
+            terminal_column = 0;
+            print_numbers(mm->base_addr_high);
+            terminal_row++;
+            terminal_column = 0;
+            print_numbers(mm->length_low);
+            terminal_row++;
+            terminal_column = 0;
+            print_numbers(mm->length_high);
+            terminal_row++;
+            terminal_column = 0;
+            print_numbers(mm->type);
+            terminal_row++;
+            terminal_column = 0;
+            j++;
+        }
+        if((mm->type != 1))
+        {
+            k++;
+        }
+        i++;
+        mm++;
+    }
+    terminal_writestring("count_1 = ");
+    print_numbers(j);
+    terminal_row++;
+    terminal_column = 0;
+    terminal_writestring("count_null = ");
+    print_numbers(k);
+    terminal_row++;
+    terminal_column = 0;
+    print_numbers(sizeof(unsigned long));
 }
