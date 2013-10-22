@@ -4,12 +4,13 @@
 #include <stddef.h>
 #include <stdint.h>
 #include "multiboot.h"
+#include "mmu.c"
 
 /* Check if the compiler thinks if we are targeting the wrong operating system. */
 #if defined(__linux__)
 #error "You are not using a cross-compiler, you will most certainly run into trouble"
 #endif
-
+extern int /* the type doesn't matter! */ _end;
 /* Hardware text mode color constants. */
 enum vga_color
 {
@@ -162,10 +163,14 @@ void kernel_main(multiboot_info_t* mbd,unsigned int magic)
 {
 
 	uint16_t i = 1,j=0,k=0;
+	uintptr_t kernel_end = (uintptr_t) &_end;
 	terminal_initialize();
 	/* Since there is no support for newlines in terminal_putchar yet, \n will
 	   produce some VGA specific character instead. This is normal.
 	*/
+	print_numbers(kernel_end);
+	terminal_row++;
+	terminal_column=0;
 	print_numbers(mbd->mmap_length);//144
 	terminal_row++;
 	terminal_column=0;
